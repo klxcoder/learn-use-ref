@@ -1,10 +1,12 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 function RenderCounter() {
   const [count, setCount] = useState(0);
-  const renderCountRef = useRef(0);
+  const renderCountRef = useRef(1); // Start at 1 since the initial render counts
 
-  renderCountRef.current += 1; // Increase renderCountRef.current each time render
+  useEffect(() => {
+    renderCountRef.current += 1; // Increment on each render
+  });
 
   return (
     <div>
