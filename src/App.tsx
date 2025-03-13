@@ -1,38 +1,24 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 
 function App() {
   // Create a ref for the input
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Add a second ref to track previous input value
-  const prevInputValueRef = useRef<string>('');
-
-  // Add state to track current input value
-  const [inputValue, setInputValue] = useState<string>('');
-
-  // Count how many times the component renders
+  // Create a ref to track render count
   const renderCountRef = useRef<number>(0);
 
-  // Function to focus the input
-  const focusInput = () => {
-    inputRef.current?.focus();
-  };
-
-  // Function to handle input change
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-  };
-
-  // Log render count on each render
+  // Log render count on each render to demonstrate no re-renders occur when typing
   useEffect(() => {
     renderCountRef.current += 1;
     console.log(`Component rendered ${renderCountRef.current} times`);
   });
 
-  // Store previous value in ref after each render
-  useEffect(() => {
-    prevInputValueRef.current = inputValue;
-  }, [inputValue]);
+  // Function to demonstrate we can still access the current value
+  const logInputValue = () => {
+    console.log(`Current input value: ${inputRef.current?.value}`);
+    // We could use the current value for any operation here
+    alert(`You typed: ${inputRef.current?.value}`);
+  };
 
   return (
     <div>
@@ -40,17 +26,13 @@ function App() {
         ref={inputRef}
         type="text"
         placeholder="Type something..."
-        value={inputValue}
-        onChange={handleChange}
+      // Note: No value or onChange props, so React doesn't control this input
       />
-      <button onClick={focusInput}>
-        Focus the input
+      <button onClick={logInputValue}>
+        Show Value
       </button>
-      <div>
-        <p>Current value: {inputValue}</p>
-        <p>Previous value: {prevInputValueRef.current}</p>
-        <p>Render count: {renderCountRef.current}</p>
-      </div>
+      <p>Render count: {renderCountRef.current}</p>
+      <p>Try typing in the input - the render count won't change!</p>
     </div>
   );
 }
