@@ -1,33 +1,44 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
-function DebouncedSearch() {
-  const [query, setQuery] = useState('');
-  const [result, setResult] = useState('');
-  const debounceRef = useRef<number | null>(null);
+function CountdownTimer() {
+  const [timeLeft, setTimeLeft] = useState(10); // 10 seconds countdown
+  const intervalRef = useRef<number | null>(null);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value);
+  const startTimer = () => {
+    if (intervalRef.current) return; // Prevent multiple intervals
 
-    // Clear the previous timer
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-
-    // Set a new timer
-    debounceRef.current = setTimeout(() => {
-      setResult(`Searching for: ${e.target.value}`);
-    }, 500);
+    intervalRef.current = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(intervalRef.current!);
+          intervalRef.current = null; // Reset ref when finished
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
   };
+
+  const pauseTimer = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current); // Cleanup on unmount
+    };
+  }, []);
 
   return (
     <div>
-      <input
-        type="text"
-        value={query}
-        onChange={handleInputChange}
-        placeholder="Search..."
-      />
-      <p>{result}</p>
+      <h1>Time Left: {timeLeft}s</h1>
+      <button onClick={startTimer}>Start</button>
+      <button onClick={pauseTimer}>Pause</button>
     </div>
   );
 }
 
-export default DebouncedSearch;
+export default CountdownTimer;
