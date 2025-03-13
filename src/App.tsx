@@ -1,48 +1,27 @@
-import { useRef, useEffect } from 'react';
-import styles from './Box.module.scss';
+import { forwardRef, useRef } from 'react';
 
-function MovingBox() {
-  const boxRef = useRef<HTMLDivElement | null>(null);
-  const animationRef = useRef<number | null>(null);
-  const positionRef = useRef(0);
+const Input = forwardRef<HTMLInputElement, { label: string }>(
+  ({ label }, ref) => (
+    <div>
+      <label>{label}</label>
+      <input ref={ref} />
+    </div>
+  )
+);
 
-  const moveBox = () => {
-    if (boxRef.current) {
-      positionRef.current += 2; // Move 2px per frame
-      boxRef.current.style.transform = `translateX(${positionRef.current}px)`;
+function App() {
+  const inputRef = useRef<HTMLInputElement>(null);
 
-      if (positionRef.current < 500) {
-        animationRef.current = requestAnimationFrame(moveBox);
-      }
-    }
+  const focusInput = () => {
+    inputRef.current?.focus();
   };
-
-  const startAnimation = () => {
-    if (!animationRef.current) {
-      animationRef.current = requestAnimationFrame(moveBox);
-    }
-  };
-
-  const stopAnimation = () => {
-    if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current);
-      animationRef.current = null;
-    }
-  };
-
-  useEffect(() => {
-    return () => {
-      if (animationRef.current) cancelAnimationFrame(animationRef.current); // Cleanup on unmount
-    };
-  }, []);
 
   return (
     <div>
-      <div ref={boxRef} className={styles.box}></div>
-      <button onClick={startAnimation}>Start</button>
-      <button onClick={stopAnimation}>Stop</button>
+      <Input ref={inputRef} label="Enter text:" />
+      <button onClick={focusInput}>Focus Input</button>
     </div>
   );
 }
 
-export default MovingBox;
+export default App;
