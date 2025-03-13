@@ -1,20 +1,48 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
+import styles from './Box.module.scss';
 
-function RenderCounter() {
-  const [count, setCount] = useState(0);
-  const renderCountRef = useRef(1); // Start at 1 since the initial render counts
+function MovingBox() {
+  const boxRef = useRef<HTMLDivElement | null>(null);
+  const animationRef = useRef<number | null>(null);
+  const positionRef = useRef(0);
+
+  const moveBox = () => {
+    if (boxRef.current) {
+      positionRef.current += 2; // Move 2px per frame
+      boxRef.current.style.transform = `translateX(${positionRef.current}px)`;
+
+      if (positionRef.current < 500) {
+        animationRef.current = requestAnimationFrame(moveBox);
+      }
+    }
+  };
+
+  const startAnimation = () => {
+    if (!animationRef.current) {
+      animationRef.current = requestAnimationFrame(moveBox);
+    }
+  };
+
+  const stopAnimation = () => {
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
+  };
 
   useEffect(() => {
-    renderCountRef.current += 1; // Increment on each render
-  });
+    return () => {
+      if (animationRef.current) cancelAnimationFrame(animationRef.current); // Cleanup on unmount
+    };
+  }, []);
 
   return (
     <div>
-      <p>Count: {count}</p>
-      <p>Render Count: {renderCountRef.current}</p>
-      <button onClick={() => setCount(count + 1)}>Increment</button>
+      <div ref={boxRef} className={styles.box}></div>
+      <button onClick={startAnimation}>Start</button>
+      <button onClick={stopAnimation}>Stop</button>
     </div>
   );
 }
 
-export default RenderCounter;
+export default MovingBox;
