@@ -1,18 +1,20 @@
-import { useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
-function App() {
-  const inputRef = useRef<HTMLInputElement>(null);
+function PreviousValueTracker() {
+  const [count, setCount] = useState(0);
+  const prevCountRef = useRef<number | null>(null);
 
-  const handleClick = () => {
-    inputRef.current?.focus();
-  };
+  useEffect(() => {
+    prevCountRef.current = count; // Store the current count as the previous one
+  }, [count]);
 
   return (
     <div>
-      <input ref={inputRef} type="text" placeholder="Type here..." />
-      <button onClick={handleClick}>Focus Input</button>
+      <p>Current Count: {count}</p>
+      <p>Previous Count: {prevCountRef.current === null ? 'null' : prevCountRef.current}</p>
+      <button onClick={() => setCount(count + 1)}>Increment</button>
     </div>
   );
 }
 
-export default App;
+export default PreviousValueTracker;
